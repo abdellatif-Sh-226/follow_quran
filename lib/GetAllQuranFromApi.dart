@@ -3,26 +3,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 
 void main() async {
-  int surahNumber = 54; // رقم السورة الي تحب تجيبها (مثال: الإخلاص)
-
-  // جلب البيانات من API
-  var response = await http.get(
-    Uri.parse("https://api.alquran.cloud/v1/surah/$surahNumber"),
-  );
-
-  if (response.statusCode != 200) {
-    print("خطأ في تحميل السورة!");
-    return;
-  }
-
-  var data = jsonDecode(response.body);
-  var ayahs = data["data"]["ayahs"];
-  var surahName =
-      data["data"]["englishName"]; // أو data["data"]["name"] بالعربي
-
-  List result = [];
   String removeTashkeel(String text) {
-    // حذف كل الحركات وعلامات القرآن + الرموز الخاصة
     return text.replaceAll(RegExp(r'[ًٌٍَُِّْۚۛۖۗۜ۟ۡۥࣰࣱٰۢۤ]'), '');
   }
 
@@ -31,21 +12,41 @@ void main() async {
     return noTashkeel.replaceAll(RegExp(r'\s+'), ' ').trim();
   }
 
-  for (var a in ayahs) {
-    result.add({
-      "surah": surahName,
-      "ayah": a["numberInSurah"],
-      "text": cleanText(a["text"]), // النص يتنظف قبل ما يتحط
-      "page": a["page"],
-    });
+  // loop من السورة 1 إلى 114
+  for (int surahNumber = 1; surahNumber <= 114; surahNumber++) {
+    print("جاري تحميل السورة $surahNumber");
+
+    var response = await http.get(
+      Uri.parse("https://api.alquran.cloud/v1/surah/$surahNumber"),
+    );
+
+    if (response.statusCode != 200) {
+      print("خطأ في تحميل السورة $surahNumber");
+      continue;
+    }
+
+    var data = jsonDecode(response.body);
+    var ayahs = data["data"]["ayahs"];
+    var surahName = data["data"]["englishName"];
+
+    List result = [];
+
+    for (var a in ayahs) {
+      result.add({
+        "surah": surahName,
+        "ayah": a["numberInSurah"],
+        "text": cleanText(a["text"]),
+        "page": a["page"],
+      });
+    }
+
+    var jsonString = JsonEncoder.withIndent("  ").convert(result);
+
+    File file = File('surah_$surahNumber.json');
+    await file.writeAsString(jsonString);
+
+    print("تم إنشاء: surah_$surahNumber.json");
   }
 
-  // تحويل JSON لString منسق
-  var jsonString = JsonEncoder.withIndent("  ").convert(result);
-
-  // حفظ في ملف JSON
-  File file = File('surah_$surahNumber.json');
-  await file.writeAsString(jsonString);
-
-  print("تم إنشاء الملف: surah_$surahNumber.json");
+  print("تم إنشاء كل السور بنجاح");
 }

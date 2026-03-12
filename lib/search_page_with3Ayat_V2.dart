@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:string_similarity/string_similarity.dart';
 
-class SearchPage3Ayat extends StatefulWidget {
+class SearchPage3AyatV2 extends StatefulWidget {
   @override
   _SearchPageState createState() => _SearchPageState();
 }
 
-class _SearchPageState extends State<SearchPage3Ayat> {
+class _SearchPageState extends State<SearchPage3AyatV2> {
   List quranData = [];
   List chunks = [];
   String result = "";
@@ -18,24 +18,36 @@ class _SearchPageState extends State<SearchPage3Ayat> {
   @override
   void initState() {
     super.initState();
-    loadQuran();
+    loadQuranAndBuildChunks();
   }
 
+  // تحميل كل sourates و بناء chunks
+  Future<void> loadQuranAndBuildChunks() async {
+    List allAyat = await loadQuran();
+    setState(() {
+      quranData = allAyat;
+      chunks = buildChunks(allAyat);
+    });
+  }
+
+  // تحميل جميع sourates من assets/quran/
   Future<List> loadQuran() async {
     List allAyat = [];
     for (int i = 1; i <= 114; i++) {
-      String data = await rootBundle.loadString('assets/quran/surah_$i.json');
-      List surah = jsonDecode(data);
-      allAyat.addAll(surah);
+      try {
+        String data = await rootBundle.loadString('assets/quran/surah_$i.json');
+        List surah = jsonDecode(data);
+        allAyat.addAll(surah);
+      } catch (e) {
+        print("Erreur loading surah_$i.json : $e");
+      }
     }
-
     return allAyat;
   }
 
-  // بناء مقاطع من 3 آيات
+  // بناء مقاطع من 3 آيات لكل sourah
   List buildChunks(List data) {
     List list = [];
-
     for (int i = 0; i < data.length - 2; i++) {
       if (data[i]["surah"] == data[i + 1]["surah"] &&
           data[i]["surah"] == data[i + 2]["surah"]) {
@@ -50,12 +62,18 @@ class _SearchPageState extends State<SearchPage3Ayat> {
         });
       }
     }
-
     return list;
   }
 
+  // البحث عن النص
   void searchAyah() {
-    String input = controller.text;
+    String input = controller.text.trim();
+    if (input.isEmpty) {
+      setState(() {
+        result = "اكتب نص للبحث";
+      });
+      return;
+    }
 
     double bestScore = 0;
     Map? bestMatch;
@@ -72,10 +90,10 @@ class _SearchPageState extends State<SearchPage3Ayat> {
       }
     }
 
-    if (bestMatch != null) {
+    if (bestMatch != null && bestScore > 0.1) {
       setState(() {
         result =
-            "السورة: ${bestMatch!["surah"]}\nالآية: ${bestMatch["ayah"]}\nالصفحة: ${bestMatch["page"]}\nSimilarity: ${bestScore.toStringAsFixed(2)}";
+            "السورة: ${bestMatch?["surah"]}\nالآية: ${bestMatch?["ayah"]}\nالصفحة: ${bestMatch?["page"]}\nتشابه: ${bestScore.toStringAsFixed(2)}";
       });
     } else {
       setState(() {
@@ -88,23 +106,17 @@ class _SearchPageState extends State<SearchPage3Ayat> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text("Quran Search Test")),
-
       body: Padding(
         padding: EdgeInsets.all(20),
-
         child: Column(
           children: [
             TextField(
               controller: controller,
               decoration: InputDecoration(labelText: "اكتب آية أو أكثر"),
             ),
-
             SizedBox(height: 20),
-
             ElevatedButton(onPressed: searchAyah, child: Text("Search")),
-
             SizedBox(height: 30),
-
             Text(result, style: TextStyle(fontSize: 22)),
           ],
         ),
