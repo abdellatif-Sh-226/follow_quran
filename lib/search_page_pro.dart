@@ -35,12 +35,10 @@ class _SearchPageState extends State<SearchPage1> {
       return;
     }
 
-    // 1️⃣ تقسيم النص إلى كلمات
     List<String> words = input.split(" ");
 
     List<Map> filtered = [];
 
-    // 2️⃣ فلترة الآيات التي تحتوي على أي كلمة
     for (var ayah in quranData) {
       for (var word in words) {
         if (ayah["text"].contains(word)) {
@@ -57,7 +55,6 @@ class _SearchPageState extends State<SearchPage1> {
       return;
     }
 
-    // 3️⃣ Fuzzy Search على النتائج المفلترة
     double bestScore = 0;
     Map? bestMatch;
 

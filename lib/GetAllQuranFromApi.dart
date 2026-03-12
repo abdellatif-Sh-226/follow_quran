@@ -12,7 +12,6 @@ void main() async {
     return noTashkeel.replaceAll(RegExp(r'\s+'), ' ').trim();
   }
 
-  // loop من السورة 1 إلى 114
   for (int surahNumber = 1; surahNumber <= 114; surahNumber++) {
     print("جاري تحميل السورة $surahNumber");
 
@@ -21,7 +20,7 @@ void main() async {
     );
 
     if (response.statusCode != 200) {
-      print("خطأ في تحميل السورة $surahNumber");
+      print("Error loading surah $surahNumber");
       continue;
     }
 
@@ -45,8 +44,8 @@ void main() async {
     File file = File('surah_$surahNumber.json');
     await file.writeAsString(jsonString);
 
-    print("تم إنشاء: surah_$surahNumber.json");
+    print("created successfully: surah_$surahNumber.json");
   }
 
-  print("تم إنشاء كل السور بنجاح");
+  print("done");
 }

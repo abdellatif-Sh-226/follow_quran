@@ -21,7 +21,6 @@ class _SearchPageState extends State<SearchPage3AyatV2> {
     loadQuranAndBuildChunks();
   }
 
-  // تحميل كل sourates و بناء chunks
   Future<void> loadQuranAndBuildChunks() async {
     List allAyat = await loadQuran();
     setState(() {
@@ -30,7 +29,6 @@ class _SearchPageState extends State<SearchPage3AyatV2> {
     });
   }
 
-  // تحميل جميع sourates من assets/quran/
   Future<List> loadQuran() async {
     List allAyat = [];
     for (int i = 1; i <= 114; i++) {
@@ -45,7 +43,6 @@ class _SearchPageState extends State<SearchPage3AyatV2> {
     return allAyat;
   }
 
-  // بناء مقاطع من 3 آيات لكل sourah
   List buildChunks(List data) {
     List list = [];
     for (int i = 0; i < data.length - 2; i++) {
@@ -65,7 +62,6 @@ class _SearchPageState extends State<SearchPage3AyatV2> {
     return list;
   }
 
-  // البحث عن النص
   void searchAyah() {
     String input = controller.text.trim();
     if (input.isEmpty) {

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-//import 'package:follow_quran/microTest.dart';
 import 'package:follow_quran/search_page_with3Ayat_V2.dart';
 
 void main() {

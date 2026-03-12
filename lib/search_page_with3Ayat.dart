@@ -32,7 +32,6 @@ class _SearchPageState extends State<SearchPage3Ayat> {
     return allAyat;
   }
 
-  // بناء مقاطع من 3 آيات
   List buildChunks(List data) {
     List list = [];
 
