@@ -43,7 +43,55 @@ class _AudioQuranPageState extends State<AudioQuranPage> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    throw UnimplementedError();
+    return Scaffold(
+      appBar: AppBar(title: Text("Quran Audio Player")),
+
+      body: Padding(
+        padding: EdgeInsets.all(20),
+
+        child: Column(
+          children: [
+            TextField(
+              controller: surahController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: "Surah Number",
+                border: OutlineInputBorder(),
+              ),
+            ),
+
+            SizedBox(height: 15),
+
+            TextField(
+              controller: ayahController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: "Ayah Number",
+                border: OutlineInputBorder(),
+              ),
+            ),
+
+            SizedBox(height: 20),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(onPressed: playAudio, child: Text("Play")),
+
+                ElevatedButton(onPressed: stopAudio, child: Text("Stop")),
+              ],
+            ),
+
+            SizedBox(height: 30),
+
+            Text("Audio URL:", style: TextStyle(fontWeight: FontWeight.bold)),
+
+            SizedBox(height: 10),
+
+            Text(audioUrl),
+          ],
+        ),
+      ),
+    );
   }
 }
